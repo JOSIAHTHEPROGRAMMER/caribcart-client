@@ -63,7 +63,7 @@ export default function AboutSection() {
           uniquely Caribbean spirit.
         </p>
 
-        <div className="relative max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16 pt-16">
+        <div className="relative max-w-6xl mx-auto text-center grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16 pt-16">
           {features.map((item, index) => (
             <div
               key={index}

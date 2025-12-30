@@ -5,3 +5,15 @@
 
   font-family: 'Rethink Sans', sans-serif;
 }
+
+button, input, optgroup, select, textarea {
+  font-family: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

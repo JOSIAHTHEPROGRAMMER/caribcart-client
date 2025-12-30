@@ -1,5 +1,4 @@
-import React from "react";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 import Home from "./pages/Home";
 import Marketplace from "./pages/Marketplace";
 import Loading from "./pages/Loading";
@@ -12,10 +11,31 @@ import ListingDetails from "./pages/ListingDetails";
 import ContactForm from "./pages/ContactForm";
 import Careers from "./pages/Careers";
 import AboutUs from "./pages/AboutUs";
+import Navbar from "./components/NavBar";
+import { Toaster } from 'react-hot-toast';
+
 
 const App = () => {
+  const {pathname} = useLocation();
+
+
+
   return (
     <div>
+      <Toaster
+  position="top-right"
+  toastOptions={{
+    duration: 3000,
+    style: {
+      background: '#FF6B6B',
+      color: '#fff',
+      fontWeight: '600',
+      borderRadius: '0.5rem',
+    },
+  }}
+/>
+
+      {!pathname.includes('/admin') && <Navbar />}
       <Routes>
         {/* Public Pages */}
         <Route path="/" element={<Home />} />

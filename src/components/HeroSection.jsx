@@ -1,10 +1,15 @@
-import React from "react";
+import React, { use } from "react";
+import { useNavigate } from "react-router-dom";
 
 const HeroSection = () => {
   const [input, setInput] = React.useState("");
+  const navigate = useNavigate();
 
   const onSubmitHandler = (e) => {
     e.preventDefault();
+    if (input.trim() !== "") {
+      navigate(`/marketplace?search=${encodeURIComponent(input.trim())}`);
+    }
   };
 
   return (
@@ -104,7 +109,7 @@ const HeroSection = () => {
               placeholder="Search Social Media Account"
               className="pl-2 flex-1 outline-none"
             />
-            <button className="bg-linear-to-r from-[#FF6B6B] to-[#FFD93D] text-white p-3 px-6 rounded-md cursor-pointer hover:scale-105 transition">
+            <button className="bg-linear-to-r from-[#FF6B6B] to-[#FFD93D] text-white p-3 px-6 rounded-md cursor-pointer hover:brightness-110 transition">
               Search
             </button>
           </label>

@@ -1,4 +1,4 @@
-import logo from './logo.svg';
+import logo from './NiceLogo.png';
 import { CiLinkedin } from 'react-icons/ci';
 import { CgYoutube, CgInstagram, CgFacebook, CgTwitter } from 'react-icons/cg';
 import {
@@ -12,6 +12,7 @@ import image_3 from './image_3.jpg';
 import image_4 from './image_4.jpg';
 
 import user_profile from './default_pic.png';
+import { tr } from 'motion/react-client';
 
 
 
@@ -114,6 +115,59 @@ export const dummyUsers = [
   },
 ];
 
+export const dummyPlans = [
+  {
+    id: "plan_basic",
+    name: "Basic",
+    description: "Ideal for individuals starting out.",
+    price: 0,
+    billed_annualy: false,
+    features: [
+      "5 Free Listings",
+      "Standard Listings",
+      "Basic Tools",
+      "Email Support",
+      "Community Access",
+      "No Branding",
+      "10% Transaction Fee",
+    ],
+    popular: false,
+  },
+  {
+    id: "plan_pro",
+    name: "Pro",
+    description: "Perfect for growing creators and small businesses.",
+    price: 29,
+    billed_annualy: true,
+    features: [
+      "Unlimited Listings",
+      "Featured Listings",
+      "Ad & Promotion Tools",
+      "1-on-1 Support",
+      "Custom Branding",
+      "7% Transaction Fee",
+    ],
+    popular: true,
+  },
+  {
+    id: "plan_enterprise",
+    name: "Enterprise",
+    description: "Best for established brands and agencies.",
+    price: 99,
+    billed_annualy: true,
+    features: [
+      "All Pro Features",
+      "Dedicated Account Manager",
+      "Priority Support",
+      "Advanced Analytics",
+      "Custom Integrations",
+      "3% Transaction Fee",
+    ],
+    popular: false,
+  },
+];
+
+
 
 //   LISTINGS 
 
@@ -121,7 +175,7 @@ export const dummyListings = [
   {
     id: 'listing_1',
     ownerId: 'user_1',
-    title: 'Caribbean Tech YouTube Channel – 145k Subscribers',
+    title: 'Caribbean Tech YouTube Channel - 145k Subscribers',
     platform: 'youtube',
     username: 'IslandTechTV',
     followers_count: 145000,
@@ -148,7 +202,7 @@ export const dummyListings = [
   {
     id: 'listing_2',
     ownerId: 'user_2',
-    title: 'Travel Instagram Page – 72k Followers',
+    title: 'Travel Instagram Page - 72k Followers',
     platform: 'instagram',
     username: 'islandwanderer',
     followers_count: 72000,
@@ -175,7 +229,7 @@ export const dummyListings = [
   {
     id: 'listing_3',
     ownerId: 'user_3',
-    title: 'Fitness TikTok – 310k Followers',
+    title: 'Fitness TikTok - 310k Followers',
     platform: 'tiktok',
     username: 'fitwithdarren',
     followers_count: 310000,
@@ -202,7 +256,7 @@ export const dummyListings = [
   {
     id: 'listing_4',
     ownerId: 'user_4',
-    title: 'Food Pinterest Board – 110k Monthly Views',
+    title: 'Food Pinterest Board - 110k Monthly Views',
     platform: 'pinterest',
     username: 'caribbites',
     followers_count: 18000,
