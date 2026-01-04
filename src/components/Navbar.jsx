@@ -33,6 +33,7 @@ const Navbar = () => {
         }
     };
 
+
     const handlePublicRoute = () => {
         scrollTo(0, 0);
         setMenuOpen(false);
@@ -54,12 +55,14 @@ const Navbar = () => {
             {/* Desktop Navbar */}
             <div className="fixed inset-x-0 top-0 z-100 flex items-center justify-between px-6 md:px-16 lg:px-24 xl:px-32 py-4 border-b border-gray-300 bg-white">
                 {/* Logo */}
+                <Link to="/" onClick={handlePublicRoute}>
                 <img
                     src={assets.logo}
                     alt="Logo"
-                    onClick={handlePublicRoute}
                     className="h-10 scale-300 origin-left cursor-pointer"
                 />
+
+                </Link>
 
                 {/* Desktop Menu */}
                 <div className="hidden sm:flex items-center gap-4 md:gap-8 text-gray-800">
@@ -72,7 +75,7 @@ const Navbar = () => {
                     {!isSignedIn && isLoaded && (
                         <button
                             onClick={openSignIn}
-                            className="cursor-pointer px-8 py-2 bg-linear-to-r from-[#FF6B6B] to-[#FFD93D] text-white rounded-md hover:brightness-110 transition"
+                            className="cursor-pointer px-8 py-2 bg-linear-to-r from-[#FF6B6B] to-[#FFD93D] text-white rounded-md hover:bg-linear-to-r hover:from-teal-400 hover:via-cyan-500 hover:to-blue-800 transition"
                         >
                             Login
                         </button>
@@ -107,7 +110,7 @@ const Navbar = () => {
                     {!isSignedIn && isLoaded && (
                         <button
                             onClick={openSignIn}
-                            className="cursor-pointer px-8 py-2 bg-linear-to-r from-[#FF6B6B] to-[#FFD93D] text-white rounded-md hover:brightness-110 transition"
+                            className="cursor-pointer px-8 py-2 bg-linear-to-r from-[#FF6B6B] to-[#FFD93D] text-white rounded-md hover:bg-linear-to-r hover:from-teal-400 hover:via-cyan-500 hover:to-blue-800 transition"
                         >
                             Login
                         </button>

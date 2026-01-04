@@ -11,8 +11,9 @@ import ListingDetails from "./pages/ListingDetails";
 import ContactForm from "./pages/ContactForm";
 import Careers from "./pages/Careers";
 import AboutUs from "./pages/AboutUs";
-import Navbar from "./components/NavBar";
+import Navbar from "./components/Navbar";
 import { Toaster } from 'react-hot-toast';
+import Footer from "./components/Footer";
 
 
 const App = () => {
@@ -60,6 +61,7 @@ const App = () => {
         {/* Contact */}
         <Route path="/contact" element={<ContactForm />} />
       </Routes>
+           {!pathname.includes('/admin') && <Footer />}
     </div>
   );
 };

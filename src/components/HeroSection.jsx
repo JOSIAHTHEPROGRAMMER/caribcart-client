@@ -109,7 +109,7 @@ const HeroSection = () => {
               placeholder="Search Social Media Account"
               className="pl-2 flex-1 outline-none"
             />
-            <button className="bg-linear-to-r from-[#FF6B6B] to-[#FFD93D] text-white p-3 px-6 rounded-md cursor-pointer hover:brightness-110 transition">
+            <button className="bg-linear-to-r from-[#FF6B6B] to-[#FFD93D] text-white p-3 px-6 rounded-md cursor-pointer hover:bg-linear-to-r hover:from-teal-400 hover:via-cyan-500 hover:to-blue-800 transition">
               Search
             </button>
           </label>
