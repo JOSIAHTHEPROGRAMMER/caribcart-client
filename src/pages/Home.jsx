@@ -2,6 +2,7 @@ import React from 'react'
 import HeroSection from '../components/HeroSection'
 import RecentListing from '../components/RecentListing'
 import Plans from '../components/Plans'
+import CTA from '../components/CTA'
 
 const Home = () => {
   return (
@@ -9,6 +10,7 @@ const Home = () => {
        <HeroSection/>
        <RecentListing/>
        <Plans/>
+       <CTA/>
     </div>
   )
 }
