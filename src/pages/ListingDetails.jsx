@@ -79,7 +79,7 @@ const ListingDetails = () => {
       setChat({
         listing,
         chatId: existingChat?.id ?? null,
-      })
+      }),
     );
   };
 
@@ -150,7 +150,7 @@ const ListingDetails = () => {
                     {listing.platformAssured && (
                       <Badge
                         text="Platform Assured"
-                        color="indigo"
+                        color="sky"
                         icon={ShieldCheck}
                       />
                     )}
@@ -254,8 +254,8 @@ const ListingDetails = () => {
                 listing.isCredentialVerified
                   ? "Verified"
                   : listing.isCredentialSubmitted
-                  ? "Submitted"
-                  : "Not Submitted"
+                    ? "Submitted"
+                    : "Not Submitted"
               }
             />
             <Detail label="Featured" value={listing.featured ? "Yes" : "No"} />
