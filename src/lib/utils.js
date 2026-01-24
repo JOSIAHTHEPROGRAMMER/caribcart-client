@@ -50,13 +50,13 @@ export function formatCurrency(price, country) {
   if (!price && price !== 0) {
     return 'Price not available';
   }
-  
+
   const currencyCode = CURRENCY_MAP[country] || CURRENCY_MAP['default'];
   const formattedPrice = price.toLocaleString('en-US', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
   });
-  
+
   return `$${formattedPrice} ${currencyCode}`;
 }
 
@@ -64,12 +64,12 @@ export function formatCurrencySymbolOnly(price) {
   if (!price && price !== 0) {
     return 'Price not available';
   }
-  
+
   const formattedPrice = price.toLocaleString('en-US', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
   });
-  
+
   return `$${formattedPrice}`;
 }
 
@@ -85,7 +85,7 @@ export function convertCurrency(price, fromCountry, toCountry = null) {
   }
 
   const userCountry = toCountry || getUserCountry();
-  
+
   if (fromCountry === userCountry) {
     return price;
   }
@@ -120,7 +120,7 @@ export async function detectUserLocation() {
   try {
     const response = await fetch('https://ipapi.co/json/');
     const data = await response.json();
-    
+
     const countryMap = {
       'TT': 'Trinidad & Tobago',
       'JM': 'Jamaica',
@@ -143,7 +143,7 @@ export async function detectUserLocation() {
 
     const detectedCountry = countryMap[data.country_code] || 'Trinidad & Tobago';
     setUserCountry(detectedCountry);
-    
+
     return detectedCountry;
   } catch (error) {
     console.error('Failed to detect location:', error);
@@ -165,6 +165,29 @@ export function formatCurrencyWithConversion(price, itemCountry, userCountry = n
 
   const targetCountry = userCountry || getUserCountry();
   const convertedPrice = convertCurrency(price, itemCountry, targetCountry);
-  
+
   return formatCurrency(convertedPrice, targetCountry);
 }
+
+export const getDateLabel = (dateString) => {
+  const date = new Date(dateString);
+  const today = new Date();
+  const yesterday = new Date();
+
+  yesterday.setDate(today.getDate() - 1);
+
+  const isSameDay = (d1, d2) =>
+    d1.getFullYear() === d2.getFullYear() &&
+    d1.getMonth() === d2.getMonth() &&
+    d1.getDate() === d2.getDate();
+
+  if (isSameDay(date, today)) return "Today";
+  if (isSameDay(date, yesterday)) return "Yesterday";
+
+  return date.toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+};
+

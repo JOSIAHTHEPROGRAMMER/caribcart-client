@@ -93,7 +93,8 @@ const HeroSection = () => {
         </h1>
 
         <p className="max-w-xl text-center text-base my-7 text-gray-700">
-          Connect, trade, and purchase profiles in a safe, hassle free environment.
+          Connect, trade, and purchase profiles in a safe, hassle free
+          environment.
         </p>
 
         {/* Search Box */}
@@ -109,7 +110,10 @@ const HeroSection = () => {
               placeholder="Search Social Media Account"
               className="pl-2 flex-1 outline-none"
             />
-            <button className="bg-linear-to-r from-[#FF6B6B] to-[#FFD93D] text-white p-3 px-6 rounded-md cursor-pointer hover:bg-linear-to-r hover:from-teal-400 hover:via-cyan-500 hover:to-blue-800 transition">
+            <button
+              className="bg-linear-to-r from-[#FF6B6B] to-[#FFD93D] text-white p-3 px-6 rounded-md cursor-pointer 
+            hover:bg-linear-to-r hover:from-teal-400 hover:via-cyan-500 hover:to-blue-800 transition-colors"
+            >
               Search
             </button>
           </label>

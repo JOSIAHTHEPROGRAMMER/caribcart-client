@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
-import { useSelector } from 'react-redux'
-import { getProfileLink, platformIcons } from '../assets/assets'
-import { LoaderOne } from '../components/ui/loader'
+import React, { useEffect, useRef, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { dummyChats, getProfileLink, platformIcons } from "../assets/assets";
+import { LoaderOne } from "../components/ui/loader";
 import {
   ArrowLeftIcon,
   ArrowUpRightFromSquare,
@@ -15,73 +15,89 @@ import {
   ShieldCheck,
   ShoppingBagIcon,
   Users,
-} from 'lucide-react'
-import { formatCurrencyWithConversion } from '../lib/utils'
-import Badge from '../components/ui/Badge'
-import SliderButton from '../components/ui/SliderButton'
-import InfoCard from '../components/ui/InfoCard'
-import Metric from '../components/ui/Metric'
-import Detail from '../components/ui/Detail'
+} from "lucide-react";
+import { formatCurrencyWithConversion } from "../lib/utils";
+import Badge from "../components/ui/Badge";
+import SliderButton from "../components/ui/SliderButton";
+import InfoCard from "../components/ui/InfoCard";
+import Metric from "../components/ui/Metric";
+import Detail from "../components/ui/Detail";
+import { setChat } from "../app/features/chatSlice";
 
 const ListingDetails = () => {
-  const navigate = useNavigate()
-  const { listingId } = useParams()
-  const { listings } = useSelector((state) => state.listing)
+  const navigate = useNavigate();
+  const { listingId } = useParams();
+  const { listings } = useSelector((state) => state.listing);
 
-  const [listing, setListing] = useState(null)
-  const [current, setCurrent] = useState(0)
+  const [listing, setListing] = useState(null);
+  const [current, setCurrent] = useState(0);
 
-  const images = listing?.images || []
+  const dispatch = useDispatch();
 
-  //  SWIPE HANDLING 
-  const touchStartX = useRef(null)
-  const touchEndX = useRef(null)
+  const images = listing?.images || [];
+
+  //  SWIPE HANDLING
+  const touchStartX = useRef(null);
+  const touchEndX = useRef(null);
 
   const prevSlide = () => {
-    if (images.length <= 1) return
-    setCurrent((prev) => (prev - 1 + images.length) % images.length)
-  }
+    if (images.length <= 1) return;
+    setCurrent((prev) => (prev - 1 + images.length) % images.length);
+  };
 
   const nextSlide = () => {
-    if (images.length <= 1) return
-    setCurrent((prev) => (prev + 1) % images.length)
-  }
+    if (images.length <= 1) return;
+    setCurrent((prev) => (prev + 1) % images.length);
+  };
 
   const onTouchStart = (e) => {
-    touchStartX.current = e.touches[0].clientX
-  }
+    touchStartX.current = e.touches[0].clientX;
+  };
 
   const onTouchMove = (e) => {
-    touchEndX.current = e.touches[0].clientX
-  }
+    touchEndX.current = e.touches[0].clientX;
+  };
 
   const onTouchEnd = () => {
-    if (touchStartX.current === null || touchEndX.current === null) return
+    if (touchStartX.current === null || touchEndX.current === null) return;
 
-    const diff = touchStartX.current - touchEndX.current
-    if (Math.abs(diff) < 60) return
+    const diff = touchStartX.current - touchEndX.current;
+    if (Math.abs(diff) < 60) return;
 
-    diff > 0 ? nextSlide() : prevSlide()
+    diff > 0 ? nextSlide() : prevSlide();
 
-    touchStartX.current = null
-    touchEndX.current = null
-  }
+    touchStartX.current = null;
+    touchEndX.current = null;
+  };
 
-  // LOAD LISTING 
+  const handlePurchaseAccount = async () => {};
+
+  const handleLoadChat = () => {
+    const existingChat = dummyChats.find((c) => c.listing.id === listing.id);
+
+    dispatch(
+      setChat({
+        listing,
+        chatId: existingChat?.id ?? null,
+      })
+    );
+  };
+
+  // LOAD LISTING
   useEffect(() => {
-    const found = listings.find((l) => l.id === listingId)
-    if (found) setListing(found)
-  }, [listingId, listings])
+    const found = listings.find((l) => l.id === listingId);
+    if (found) setListing(found);
+  }, [listingId, listings]);
 
   if (!listing) {
     return (
       <div className="h-screen flex items-center justify-center">
         <LoaderOne />
       </div>
-    )
+    );
   }
 
-  const profileLink = getProfileLink(listing.platform, listing.username)
+  const profileLink = getProfileLink(listing.platform, listing.username);
 
   return (
     <div className="mx-auto min-h-screen p-4 sm:p-6 md:px-16 lg:px-24 xl:px-32">
@@ -119,7 +135,7 @@ const ListingDetails = () => {
                   </h1>
 
                   <p className="text-sm text-gray-600">
-                    @{listing.username} ·{' '}
+                    @{listing.username} ·{" "}
                     {listing.platform.charAt(0).toUpperCase() +
                       listing.platform.slice(1)}
                   </p>
@@ -132,7 +148,11 @@ const ListingDetails = () => {
                       <Badge text="Monetized" color="green" icon={DollarSign} />
                     )}
                     {listing.platformAssured && (
-                      <Badge text="Platform Assured" color="indigo" icon={ShieldCheck} />
+                      <Badge
+                        text="Platform Assured"
+                        color="indigo"
+                        icon={ShieldCheck}
+                      />
                     )}
                   </div>
                 </div>
@@ -182,7 +202,7 @@ const ListingDetails = () => {
                           key={i}
                           onClick={() => setCurrent(i)}
                           className={`w-2.5 h-2.5 rounded-full ${
-                            current === i ? 'bg-sky-600' : 'bg-gray-300'
+                            current === i ? "bg-sky-600" : "bg-gray-300"
                           }`}
                         />
                       ))}
@@ -195,9 +215,21 @@ const ListingDetails = () => {
 
           {/* METRICS */}
           <InfoCard title="Account Metrics">
-            <Metric icon={Users} value={listing.followers_count.toLocaleString()} label="Followers" />
-            <Metric icon={LineChart} value={`${listing.engagement_rate}%`} label="Engagement" />
-            <Metric icon={Eye} value={listing.monthly_views.toLocaleString()} label="Monthly Views" />
+            <Metric
+              icon={Users}
+              value={listing.followers_count.toLocaleString()}
+              label="Followers"
+            />
+            <Metric
+              icon={LineChart}
+              value={`${listing.engagement_rate}%`}
+              label="Engagement"
+            />
+            <Metric
+              icon={Eye}
+              value={listing.monthly_views.toLocaleString()}
+              label="Monthly Views"
+            />
             <Metric
               icon={Calendar}
               value={new Date(listing.createdAt).toLocaleDateString()}
@@ -220,13 +252,13 @@ const ListingDetails = () => {
               label="Credentials"
               value={
                 listing.isCredentialVerified
-                  ? 'Verified'
+                  ? "Verified"
                   : listing.isCredentialSubmitted
-                  ? 'Submitted'
-                  : 'Not Submitted'
+                  ? "Submitted"
+                  : "Not Submitted"
               }
             />
-            <Detail label="Featured" value={listing.featured ? 'Yes' : 'No'} />
+            <Detail label="Featured" value={listing.featured ? "Yes" : "No"} />
           </InfoCard>
         </div>
 
@@ -237,13 +269,15 @@ const ListingDetails = () => {
 
             <div className="flex items-center gap-4">
               <img
-                src={listing.owner?.image || '/avatar-placeholder.png'}
+                src={listing.owner?.image || "/avatar-placeholder.png"}
                 alt={listing.owner?.name}
                 className="w-14 h-14 rounded-full object-cover border"
               />
 
               <div className="flex-1">
-                <p className="font-semibold text-gray-800">{listing.owner?.name}</p>
+                <p className="font-semibold text-gray-800">
+                  {listing.owner?.name}
+                </p>
                 <p className="text-sm text-gray-500">{listing.owner?.email}</p>
               </div>
             </div>
@@ -251,7 +285,7 @@ const ListingDetails = () => {
             <div className="flex items-center gap-2 text-sm text-gray-600">
               <Calendar className="w-4 h-4 text-gray-400" />
               <span>
-                Member since{' '}
+                Member since{" "}
                 <span className="font-medium text-gray-800">
                   {new Date(listing.owner?.createdAt).toLocaleDateString()}
                 </span>
@@ -259,13 +293,19 @@ const ListingDetails = () => {
             </div>
 
             <div className="flex flex-col gap-3 pt-2">
-              <button className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-sky-500 text-sky-600 hover:bg-sky-50 transition text-sm font-medium">
+              <button
+                onClick={handleLoadChat}
+                className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-sky-500 text-sky-600 hover:bg-sky-50 transition text-sm font-medium"
+              >
                 <MessageSquareMoreIcon className="w-4 h-4" />
                 Chat
               </button>
 
               {listing.isCredentialChanged && (
-                <button className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-sky-600 text-white hover:bg-sky-700 transition text-sm font-medium">
+                <button
+                  onClick={handlePurchaseAccount}
+                  className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-sky-600 text-white hover:bg-sky-700 transition text-sm font-medium"
+                >
                   <ShoppingBagIcon className="w-4 h-4" />
                   Purchase
                 </button>
@@ -275,7 +315,7 @@ const ListingDetails = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ListingDetails
+export default ListingDetails;

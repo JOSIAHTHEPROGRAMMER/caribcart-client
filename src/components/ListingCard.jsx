@@ -7,7 +7,6 @@ import { formatCurrency, formatCurrencyWithConversion } from "../lib/utils";
 const ListingCard = ({ listing }) => {
   const navigator = useNavigate();
 
-
   if (!listing) return null;
 
   return (
@@ -15,8 +14,10 @@ const ListingCard = ({ listing }) => {
       {/* FEATURED BADGE */}
       {listing.featured && (
         <div className="absolute -top-3 -left-3 z-20">
-          <span className="px-4 py-1 text-xs font-semibold text-white rounded-full
-            bg-linear-to-r from-[#FF6B35] via-[#F7C948] to-[#FF9F1C]">
+          <span
+            className="px-4 py-1 text-xs font-semibold text-white rounded-full
+            bg-linear-to-r from-[#FF6B35] via-[#F7C948] to-[#FF9F1C]"
+          >
             Featured
           </span>
         </div>
@@ -30,11 +31,14 @@ const ListingCard = ({ listing }) => {
           <div>
             <h3 className="font-semibold text-gray-800">{listing.title}</h3>
             <p className="text-sm text-gray-500 mt-2">
-              @{listing.username} · <span className="capitalize">{listing.platform}</span>{" "}
+              @{listing.username} ·{" "}
+              <span className="capitalize">{listing.platform}</span>{" "}
             </p>
           </div>
 
-          {listing.verified && <BadgeCheck className="ml-auto text-sky-500 w-5 h-5" />}
+          {listing.verified && (
+            <BadgeCheck className="ml-auto text-sky-500 w-5 h-5" />
+          )}
         </div>
       </div>
 
@@ -60,17 +64,23 @@ const ListingCard = ({ listing }) => {
             </div>
           )}
 
-           <div className="flex items-center gap-2">   
-           <span className="ml-4 px-2 py-1 capitalize w-24 text-center rounded-lg text-xs font-semibold text-white 
-           bg-linear-to-r
-                from-[#00B4D8] via-[#0096C7] to-[#0077B6]">
-                {listing.niche}
-           </span>
-
-           </div>
+          <div className="flex items-center gap-2">
+            <span
+              className="ml-4 px-2 py-1 capitalize w-24 text-center rounded-lg text-xs font-semibold text-white 
+          bg-linear-to-r
+from-[#00B4D8]/80
+via-[#0096C7]/80
+to-[#0077B6]/80
+"
+            >
+              {listing.niche}
+            </span>
+          </div>
         </div>
 
-        <p className="text-gray-600 leading-snug line-clamp-4">{listing.description}</p>
+        <p className="text-gray-600 leading-snug line-clamp-4">
+          {listing.description}
+        </p>
       </div>
 
       {/* FOOTER */}
@@ -96,4 +106,4 @@ const ListingCard = ({ listing }) => {
   );
 };
 
-export default ListingCard
+export default ListingCard;

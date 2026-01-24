@@ -12,31 +12,29 @@ import ContactForm from "./pages/ContactForm";
 import Careers from "./pages/Careers";
 import AboutUs from "./pages/AboutUs";
 import Navbar from "./components/Navbar";
-import { Toaster } from 'react-hot-toast';
+import { Toaster } from "react-hot-toast";
 import Footer from "./components/Footer";
-
+import ChatBox from "./components/ChatBox";
 
 const App = () => {
-  const {pathname} = useLocation();
-
-
+  const { pathname } = useLocation();
 
   return (
     <div>
       <Toaster
-  position="top-right"
-  toastOptions={{
-    duration: 3000,
-    style: {
-      background: '#FF6B6B',
-      color: '#fff',
-      fontWeight: '600',
-      borderRadius: '0.5rem',
-    },
-  }}
-/>
+        position="top-right"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: "#FF6B6B",
+            color: "#fff",
+            fontWeight: "600",
+            borderRadius: "0.5rem",
+          },
+        }}
+      />
 
-      {!pathname.includes('/admin') && <Navbar />}
+      {!pathname.includes("/admin") && <Navbar />}
       <Routes>
         {/* Public Pages */}
         <Route path="/" element={<Home />} />
@@ -47,7 +45,7 @@ const App = () => {
         <Route path="/aboutus" element={<AboutUs />} />
 
         {/* Listings */}
-        <Route path="/mylisting" element={<MyListing />} />
+        <Route path="/mylistings" element={<MyListing />} />
         <Route path="/createlisting" element={<ManageListing />} />
         <Route path="/editlisting/:listingId" element={<ManageListing />} />
         <Route path="/listing/:listingId" element={<ListingDetails />} />
@@ -61,7 +59,8 @@ const App = () => {
         {/* Contact */}
         <Route path="/contact" element={<ContactForm />} />
       </Routes>
-           {!pathname.includes('/admin') && <Footer />}
+      {!pathname.includes("/admin") && <Footer />}
+      <ChatBox />
     </div>
   );
 };

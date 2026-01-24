@@ -50,11 +50,15 @@ export default function AboutSection() {
 
       <div className="relative py-20 px-4 md:px-16 lg:px-24 xl:px-40 bg-white">
         <h1
-          className="relative text-3xl md:text-4xl font-semibold text-center bg-linear-to-r
-         from-[#FF6B6B] to-[#FFD93D] bg-clip-text text-transparent"
+          className="relative text-3xl
+           md:text-4xl font-semibold text-center mb-4 text-gray-800
+       
+          "
         >
           About Our Carib Cart
         </h1>
+        <div className="w-24 h-1 bg-linear-to-r from-[#FF6B6B] to-[#FFD93D] mx-auto rounded-full mb-6"></div>
+
         <p className="text-sm md:text-base text-gray-600 text-center mt-2 max-w-xl mx-auto">
           We are a Caribbean marketplace connecting buyers and sellers in a
           safe, vibrant, and reliable online environment. Our platform empowers
