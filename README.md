@@ -3,11 +3,8 @@
 ![React](https://img.shields.io/badge/React-19.2.0-61DAFB?style=for-the-badge&logo=react&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-7.2.4-646CFF?style=for-the-badge&logo=vite&logoColor=white)
 ![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-4.1.17-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
-
-
 ![GitHub repo size](https://img.shields.io/github/repo-size/JOSIAHTHEPROGRAMMER/caribcart-client?style=for-the-badge)
 ![GitHub last commit](https://img.shields.io/github/last-commit/JOSIAHTHEPROGRAMMER/caribcart-client?style=for-the-badge)
-![GitHub license](https://img.shields.io/github/license/JOSIAHTHEPROGRAMMER/caribcart-client?style=for-the-badge)
 
 A secure marketplace platform for buying and selling social media accounts. CaribCart connects verified sellers with buyers in a trusted environment, supporting major platforms including Instagram, X (Twitter), Telegram, and YouTube.
 
