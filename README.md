@@ -3,8 +3,7 @@
 ![React](https://img.shields.io/badge/React-19.2.0-61DAFB?style=for-the-badge&logo=react&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-7.2.4-646CFF?style=for-the-badge&logo=vite&logoColor=white)
 ![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-4.1.17-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
-![Redux](https://img.shields.io/badge/Redux_Toolkit-2.10.1-764ABC?style=for-the-badge&logo=redux&logoColor=white)
-![React Router](https://img.shields.io/badge/React_Router-7.9.6-CA4245?style=for-the-badge&logo=react-router&logoColor=white)
+
 
 ![GitHub repo size](https://img.shields.io/github/repo-size/JOSIAHTHEPROGRAMMER/caribcart-client?style=for-the-badge)
 ![GitHub last commit](https://img.shields.io/github/last-commit/JOSIAHTHEPROGRAMMER/caribcart-client?style=for-the-badge)
