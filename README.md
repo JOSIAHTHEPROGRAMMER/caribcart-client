@@ -268,6 +268,14 @@ Refer to `.env.example` for the complete list of required environment variables.
 - **Credential Verify** - Verify user credentials
 - **Credential Change** - Process credential changes
 
+
+## Backend
+The backend for this project lives in a separate repository and handles authentication, listings, messaging, transactions, and admin operations.
+
+Client Server: https://github.com/JOSIAHTHEPROGRAMMER/caribcart-server
+
+
+
 ## Contributing
 
 Contributions are welcome. Please follow these steps:
