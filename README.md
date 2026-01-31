@@ -212,7 +212,7 @@ Previews the production build locally.
 Create a `.env` file in the root directory with the following variables:
 ```env
 VITE_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
-VITE_API_URL=your_backend_api_url
+VITE_BASEURL=your_backend_api_url
 ```
 
 Refer to `.env.example` for the complete list of required environment variables.
