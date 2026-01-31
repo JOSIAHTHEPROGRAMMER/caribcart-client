@@ -1,27 +1,21 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { LoaderCircle, X } from "lucide-react";
-import { dummyChats } from "../assets/assets";
 import { clearChat } from "../app/features/chatSlice";
-import {
-  LoaderFive,
-  LoaderFour,
-  LoaderOne,
-  LoaderThree,
-  LoaderTwo,
-} from "./ui/loader";
+import { LoaderOne, LoaderThree } from "./ui/loader";
 import { getDateLabel } from "../lib/utils";
+import { useAuth, useUser } from "@clerk/clerk-react";
+import api from "../configs/axios";
 
 const ChatBox = () => {
   const { listing, isOpen, chatId } = useSelector((state) => state.chat);
   const dispatch = useDispatch();
-
-  const user = { id: "user_6" };
+  const { user } = useUser();
+  const { getToken } = useAuth();
 
   const [chat, setChat] = useState(null);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const bottomRef = useRef(null);
@@ -35,28 +29,30 @@ const ChatBox = () => {
   const dateRefs = useRef({});
 
   const fetchChat = async () => {
-    setIsLoading(true);
-
-    const foundChat = dummyChats.find((c) => c.id === chatId);
-    if (!foundChat) {
-      setChat(null);
-      setMessages([]);
+    try {
+      const token = await getToken();
+      const { data } = await api.post(
+        "/api/chat",
+        { listingId: listing.id, chatId },
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      setChat(data?.chat);
+      setMessages(data?.chat?.messages || []);
       setIsLoading(false);
-      return;
+    } catch (error) {
+      toast.error(error?.response?.data?.message || error?.message);
+      console.log(error);
     }
-
-    const isParticipant =
-      foundChat.chatUser?.id === user.id || foundChat.ownerUser?.id === user.id;
-
-    setChat(foundChat);
-
-    setMessages(isParticipant ? foundChat.messages : []);
-
-    setIsLoading(false);
   };
 
   useEffect(() => {
-    if (listing) fetchChat();
+    if (listing) {
+      fetchChat();
+      const interval = setInterval(() => {
+        fetchChat();
+      }, 3000);
+      return () => clearInterval(interval);
+    }
   }, [listing]);
 
   useEffect(() => {
@@ -64,7 +60,7 @@ const ChatBox = () => {
       setChat(null);
       setMessages([]);
       setInput("");
-      setIsTyping(false);
+
       setStickyDate("");
       setIsSending(false);
       setIsLoading(true);
@@ -96,7 +92,7 @@ const ChatBox = () => {
       {
         root: scrollRef.current,
         threshold: 1,
-      }
+      },
     );
 
     Object.values(dateRefs.current).forEach((el) => {
@@ -132,19 +128,25 @@ const ChatBox = () => {
 
     if (!input.trim() || isSending) return;
 
-    setMessages((prev) => [
-      ...prev,
-      {
-        id: crypto.randomUUID(),
-        chatId: chat.id,
-        message: input,
-        sender_id: user.id,
-        createdAt: new Date(),
-      },
-    ]);
+    try {
+      setIsSending(true);
 
-    setInput("");
-    setIsTyping(false);
+      const token = await getToken();
+      const { data } = await api.post(
+        "/api/chat/send-message",
+        { chatId: chat.id, message: input },
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+
+      setMessages((prev) => [...prev, data.newMessage]);
+      setInput("");
+
+      setIsSending(false);
+    } catch (error) {
+      toast.error(error?.response?.data?.message || error?.message);
+      console.log(error);
+      setIsSending(false);
+    }
   };
 
   useEffect(() => {
@@ -171,7 +173,7 @@ const ChatBox = () => {
           <div className="flex flex-col min-w-0">
             <h3 className="font-semibold text-lg truncate">{listing.title}</h3>
             <p className="text-sm opacity-90">
-              {user.id === listing.owner?.id
+              {user.id === listing?.ownerId
                 ? `Chatting with buyer (${chat.chatUser?.name})`
                 : `Chatting with seller (${chat.ownerUser?.name})`}
             </p>
@@ -263,28 +265,12 @@ const ChatBox = () => {
             })
           )}
 
-          {isTyping && (
-            <div className="flex justify-start">
-              <div className="bg-gray-100 rounded-lg px-4 py-2 flex space-x-1">
-                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
-                <span
-                  className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                  style={{ animationDelay: "0.1s" }}
-                />
-                <span
-                  className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                  style={{ animationDelay: "0.2s" }}
-                />
-              </div>
-            </div>
-          )}
-
           <div ref={bottomRef} />
         </div>
 
         {/* Input */}
 
-        {chat?.status === "active" ? (
+        {chat?.listing?.status === "active" ? (
           <div className="border-t p-4">
             <form onSubmit={handleSendMessage} className="flex gap-2">
               <textarea
@@ -314,7 +300,7 @@ const ChatBox = () => {
         ) : (
           <div className="border-t p-4">
             <p className="text-sm text-center text-shadow-gray-600">
-              {chat ? `Listing is ${chat?.status}` : <LoaderOne />}
+              {chat ? `Listing is ${chat?.listing.status}` : <LoaderOne />}
             </p>
           </div>
         )}

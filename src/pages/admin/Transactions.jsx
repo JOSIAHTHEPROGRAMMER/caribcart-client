@@ -4,17 +4,29 @@ import { useEffect } from "react";
 import ListingDetailsModal from "../../components/admin/ListingDetailsModal";
 import { Loader2Icon } from "lucide-react";
 import { dummyOrders } from "../../assets/assets";
+import { formatCurrencyWithConversion } from "../../lib/utils";
+import { useAuth } from "@clerk/clerk-react";
+import api from "../../configs/axios";
+import toast from "react-hot-toast";
 
 const Transactions = () => {
-  const currency = import.meta.env.VITE_CURRENCY || "$";
-
+  const { getToken } = useAuth();
   const [trasactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(null);
 
   const getTransactions = async () => {
-    setTransactions(dummyOrders);
-    setLoading(false);
+    try {
+      const token = await getToken();
+      const { data } = await api.get(`/api/admin/transactions`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setTransactions(data.transactions);
+      setLoading(false);
+    } catch (error) {
+      toast.error(error?.response?.data?.message || error.message);
+      console.log(error);
+    }
   };
 
   useEffect(() => {
@@ -51,8 +63,11 @@ const Transactions = () => {
                 <td className="px-4 py-3">@{t.listing.username}</td>
                 <td className="px-4 py-3">{t.listing.platform}</td>
                 <td className="px-4 py-3">
-                  {currency}
-                  {t.amount}
+                  {formatCurrencyWithConversion(
+                    t.price,
+                    "Trinidad & Tobago",
+                    t.country,
+                  )}
                 </td>
                 <td className="px-4 py-3">
                   {new Date(t.createdAt).toLocaleString()}

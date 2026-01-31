@@ -2,15 +2,27 @@ import React, { use, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ageRanges, countries, niches, platforms } from "../assets/assets";
 import Loading from "./Loading";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { LoaderFive } from "../components/ui/loader";
 import { Upload, X } from "lucide-react";
+import { useAuth, useUser } from "@clerk/clerk-react";
+import toast from "react-hot-toast";
+import api from "../configs/axios";
+import {
+  getAllPublicListing,
+  getAllUserListing,
+} from "../app/features/listingSlice";
+import { convertCurrency, getUserCountry } from "../lib/utils";
 
 const ManageListing = () => {
   const navigate = useNavigate();
   const { userListings } = useSelector((state) => state.listing);
 
-  const { id } = useParams();
+  const { getToken } = useAuth();
+  const { user, isLoaded } = useUser();
+  const dispatch = useDispatch();
+
+  const { listingId } = useParams();
   const [isEditing, setIsEditing] = useState(false);
   const [loadingListing, setLoadingListing] = useState(false);
 
@@ -25,21 +37,16 @@ const ManageListing = () => {
     price: "",
     description: "",
     verified: false,
-    monetize: false,
+    monetized: false,
     country: "",
     age_range: "",
     images: [],
   });
 
-  const platformsLabels = platforms.map((p) => p.label);
-
-  const nichesLabels = niches.map((n) => n.label);
-
-  const ageRangesLabels = ageRanges.map((a) => a.label);
-
-  const countriesLabels = countries.map((c) => c.label);
-
-  console.log(platformsLabels);
+  const platformsLabels = platforms.map((p) => p.value);
+  const nichesLabels = niches.map((n) => n.value);
+  const ageRangesLabels = ageRanges.map((a) => a.value);
+  const countriesLabels = countries.map((c) => c.value);
 
   const handleInputChange = (field, value) => {
     setFormData((prevData) => ({
@@ -50,9 +57,7 @@ const ManageListing = () => {
 
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
-
     if (!files.length) return;
-
     if (formData.images.length + files.length > 5)
       return toast.error("You can only upload 5 images");
 
@@ -67,13 +72,12 @@ const ManageListing = () => {
   };
 
   useEffect(() => {
-    if (!id) return;
+    if (!listingId) return;
 
     setIsEditing(true);
-
     setLoadingListing(true);
 
-    const listing = userListings.find((listing) => listing.id === id);
+    const listing = userListings.find((l) => l.id === listingId);
 
     if (!listing) {
       toast.error("Listing not found");
@@ -88,20 +92,88 @@ const ManageListing = () => {
       engagement_rate: listing.engagement_rate,
       monthly_views: listing.monthly_views,
       niche: listing.niche,
-      price: listing.price,
+      price: convertCurrency(
+        listing.price,
+        "Trinidad & Tobago",
+        listing.country,
+      ),
       description: listing.description,
       verified: listing.verified,
-      monetize: listing.monetize,
+      monetized: listing.monetized,
       country: listing.country,
       age_range: listing.age_range,
       images: listing.images,
     });
 
     setLoadingListing(false);
-  }, [id]);
+  }, [listingId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    toast.loading("Saving...");
+    const dataCopy = structuredClone(formData);
+
+    try {
+      if (isEditing) {
+        dataCopy.images = formData.images.filter(
+          (image) => typeof image === "string",
+        );
+
+        dataCopy.id = listingId;
+
+        dataCopy.price = convertCurrency(
+          formData.price,
+          formData.country,
+          "Trinidad & Tobago",
+        );
+
+        const formDataInstance = new FormData();
+        formDataInstance.append("accountDetails", JSON.stringify(dataCopy));
+
+        formData.images
+          .filter((image) => typeof image !== "string")
+          .forEach((image) => {
+            formDataInstance.append("images", image);
+          });
+
+        const token = await getToken();
+
+        const { data } = await api.put("/api/listing", formDataInstance, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        toast.dismissAll();
+        toast.success(data.message);
+        dispatch(getAllUserListing({ getToken }));
+        dispatch(getAllPublicListing());
+        navigate("/mylistings");
+      } else {
+        delete dataCopy.images;
+
+        const formDataInstance = new FormData();
+        formDataInstance.append("accountDetails", JSON.stringify(dataCopy));
+
+        formData.images.forEach((image) => {
+          formDataInstance.append("images", image);
+        });
+
+        const token = await getToken();
+
+        const { data } = await api.post(`/api/listing`, formDataInstance, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        toast.dismissAll();
+        toast.success(data.message);
+        dispatch(getAllUserListing({ getToken }));
+        dispatch(getAllPublicListing());
+        navigate("/mylistings");
+      }
+    } catch (error) {
+      console.log(error);
+      toast.dismissAll();
+      toast.error(error?.response?.data?.message || error.message);
+    }
   };
 
   if (loadingListing)
@@ -225,9 +297,9 @@ const ManageListing = () => {
               />
 
               <CheckboxField
-                label="Monetize"
-                checked={formData.monetize}
-                onChange={(value) => handleInputChange("monetize", value)}
+                label="Monetized"
+                checked={formData.monetized}
+                onChange={(value) => handleInputChange("monetized", value)}
               />
             </div>
           </Section>
@@ -236,11 +308,11 @@ const ManageListing = () => {
 
           <Section title="Pricing & Description">
             <InputField
-              label="Asking Price *"
+              label="Asking Price (Based on Listing Country) *"
               type="number"
               value={formData.price}
               min={0}
-              placeholder="e.g. 500"
+              placeholder="e.g. 5000"
               onChange={(value) => handleInputChange("price", value)}
               required={true}
             />
@@ -304,7 +376,6 @@ const ManageListing = () => {
                       "
                     >
                       <X />
-                      ^h
                     </button>
                   </div>
                 ))}

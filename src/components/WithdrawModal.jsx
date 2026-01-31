@@ -1,8 +1,14 @@
+import { useAuth } from "@clerk/clerk-react";
 import { CirclePlus, ListIcon, X } from "lucide-react";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { getAllUserListing } from "../app/features/listingSlice";
+import api from "../configs/axios";
 
 const WithdrawlModal = ({ onClose }) => {
+  const { getToken } = useAuth();
+  const dispatch = useDispatch();
   const [newAmount, setNewAmount] = useState("");
   const [account, setAccount] = useState([
     { type: "text", name: "Account Holder Name", value: "" },
@@ -13,14 +19,38 @@ const WithdrawlModal = ({ onClose }) => {
     { type: "text", name: "Branch", value: "" },
   ]);
 
-  const handleAddField = () => {
-    const name = newField.trim();
-    if (!name) return toast("Please enter a field name");
-    setCredential((prev) => [...prev, { type: "text", name, value: "" }]);
-  };
-
   const handleSubmission = async (e) => {
     e.preventDefault();
+    try {
+      // check if there is at least one field
+      if (account.length === 0) {
+        return toast.error("Please add at least one field");
+      }
+
+      // check all fields are filled
+      for (const field of account) {
+        if (!field.value) {
+          return toast.error(`Please fill in the ${field.name} field`);
+        }
+      }
+
+      const confirm = window.confirm("Are you sure you want to submit?");
+      if (!confirm) return;
+
+      const token = await getToken();
+
+      const { data } = await api.post(
+        "/api/listing/withdraw",
+        { account, amount: parseInt(amount) },
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      toast.success(data.message);
+      dispatch(getAllUserListing({ getToken }));
+      onClose();
+    } catch (error) {
+      toast.error(error?.response?.data?.message || error?.message);
+      console.log(error);
+    }
   };
   return (
     <div

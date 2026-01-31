@@ -2,7 +2,11 @@ import React from "react";
 import { MapPin, FileLineChart, User, BadgeCheck } from "lucide-react";
 import { platformIcons } from "../assets/assets";
 import { useNavigate } from "react-router-dom";
-import { formatCurrency, formatCurrencyWithConversion } from "../lib/utils";
+import {
+  formatCurrency,
+  formatCurrencyWithConversion,
+  getUserCountry,
+} from "../lib/utils";
 
 const ListingCard = ({ listing }) => {
   const navigator = useNavigate();
@@ -86,7 +90,11 @@ to-[#0077B6]/80
       {/* FOOTER */}
       <div className="mt-4 flex items-center justify-between">
         <span className="font-bold text-transparent bg-clip-text bg-linear-to-r from-[#00B4D8] to-[#06D6A0]">
-          {formatCurrencyWithConversion(listing.price, listing.country)}
+          {formatCurrencyWithConversion(
+            listing.price,
+            "Trinidad & Tobago",
+            getUserCountry(),
+          )}
         </span>
 
         <button

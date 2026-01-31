@@ -1,22 +1,47 @@
 import { Outlet, Link } from "react-router-dom";
 import AdminSidebar from "../../components/admin/AdminSidebar";
 import AdminNavbar from "../../components/admin/AdminNavbar";
+import { SignIn, useAuth, useUser } from "@clerk/clerk-react";
 import { useState } from "react";
 import { useEffect } from "react";
+import api from "../../configs/axios";
+import toast from "react-hot-toast";
 import { ArrowRightIcon, Loader2Icon } from "lucide-react";
 
 const Layout = () => {
+  const { user, isLoaded } = useUser();
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const { getToken } = useAuth();
 
   const fetchIsAdmin = async () => {
-    setIsAdmin(true);
-    setIsLoading(false);
+    try {
+      const token = await getToken();
+      const { data } = await api.get("/api/admin/isAdmin", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setIsAdmin(data.isAdmin);
+    } catch (error) {
+      toast.error(error?.response?.data?.message || error.message);
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
-    fetchIsAdmin();
-  }, []);
+    if (isLoaded && user) {
+      fetchIsAdmin();
+    }
+  }, [isLoaded, user]);
+
+  if (isLoaded && !user) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <SignIn />
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (

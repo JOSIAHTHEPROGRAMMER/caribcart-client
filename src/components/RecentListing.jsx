@@ -1,7 +1,7 @@
-import React from 'react';
-import Title from './Title';
-import { useSelector } from 'react-redux';
-import { CardStack } from './ui/card-stack';
+import React from "react";
+import Title from "./Title";
+import { useSelector } from "react-redux";
+import { CardStack } from "./ui/card-stack";
 
 const RecentListing = () => {
   const { listings } = useSelector((state) => state.listing);
@@ -16,7 +16,12 @@ const RecentListing = () => {
       />
 
       <div className="flex justify-center mt-15">
-        <CardStack items={listings.slice(0, 4)} />
+        <CardStack
+          items={listings
+            .slice()
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            .slice(0, 4)}
+        />
       </div>
     </div>
   );

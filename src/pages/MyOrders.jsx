@@ -10,22 +10,37 @@ import {
 } from "lucide-react";
 import { formatCurrencyWithConversion } from "../lib/utils";
 import { format, set } from "date-fns";
+import { useAuth, useUser } from "@clerk/clerk-react";
+import api from "../configs/axios";
 
 const MyOrders = () => {
+  const { user, isLoaded } = useUser();
+  const { getToken } = useAuth();
+
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState(null);
 
   const fetchOrders = async () => {
-    // const response = await fetch('/api/orders')
-    // const data = await response.json()
-    setOrders(dummyOrders);
-    setLoading(false);
+    try {
+      setLoading(true);
+      const token = await getToken();
+      const { data } = await api.get("/api/listing/user-orders", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setOrders(data.orders);
+    } catch (error) {
+      toast.error(error?.response?.data?.message || error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    fetchOrders();
-  }, []);
+    if (user && isLoaded) {
+      fetchOrders();
+    }
+  }, [isLoaded, user]);
 
   const mask = (value, type) => {
     if (!value && value !== 0) return "-";

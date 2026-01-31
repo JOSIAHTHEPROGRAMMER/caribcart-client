@@ -5,6 +5,7 @@ export function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
 
+
 const CURRENCY_MAP = {
   'Trinidad & Tobago': 'TTD',
   'Trinidad and Tobago': 'TTD',
@@ -79,28 +80,25 @@ export function getCurrencyCode(country) {
 
 
 
-export function convertCurrency(price, fromCountry, toCountry = null) {
-  if (!price && price !== 0) {
-    return price;
-  }
-
-  const userCountry = toCountry || getUserCountry();
-
-  if (fromCountry === userCountry) {
-    return price;
-  }
+export function convertCurrency(price, fromCountry, toCountry) {
+  if (price == null) return price;
 
   const fromCurrency = getCurrencyCode(fromCountry);
-  const toCurrency = getCurrencyCode(userCountry);
+  const toCurrency = getCurrencyCode(toCountry);
 
-  const fromRate = EXCHANGE_RATES[fromCurrency] || EXCHANGE_RATES['TTD'];
-  const toRate = EXCHANGE_RATES[toCurrency] || EXCHANGE_RATES['TTD'];
+  const fromRate = EXCHANGE_RATES[fromCurrency]; // TTD per unit
+  const toRate = EXCHANGE_RATES[toCurrency];     // TTD per unit
 
-  const priceInTTD = price / fromRate;
-  const convertedPrice = priceInTTD * toRate;
+  // convert to TTD first
+  const priceInTTD = price * fromRate;
 
-  return Math.round(convertedPrice * 100) / 100;
+  // then from TTD to target
+  const converted = priceInTTD / toRate;
+
+  return Number(converted.toFixed(2)); // ← IMPORTANT
 }
+
+
 
 export function getUserCountry() {
   if (typeof window === 'undefined') {
@@ -158,13 +156,13 @@ export function setUserCountry(country) {
   }
 }
 
-export function formatCurrencyWithConversion(price, itemCountry, userCountry = null) {
+export function formatCurrencyWithConversion(price, adminCountry, userCountry = null) {
   if (!price && price !== 0) {
     return 'Price not available';
   }
 
   const targetCountry = userCountry || getUserCountry();
-  const convertedPrice = convertCurrency(price, itemCountry, targetCountry);
+  const convertedPrice = convertCurrency(price, adminCountry, targetCountry);
 
   return formatCurrency(convertedPrice, targetCountry);
 }

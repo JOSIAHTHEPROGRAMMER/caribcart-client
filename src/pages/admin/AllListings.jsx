@@ -7,23 +7,48 @@ import {
   XIcon,
 } from "lucide-react";
 import ListingDetailsModal from "../../components/admin/ListingDetailsModal";
-import { dummyListings } from "../../assets/assets";
+import toast from "react-hot-toast";
+import api from "../../configs/axios";
+import { useAuth } from "@clerk/clerk-react";
 
 const AllListings = () => {
   const [loading, setLoading] = useState(true);
   const [listings, setListings] = useState([]);
   const [showModal, setShowModal] = useState(null);
 
+  const { getToken } = useAuth();
+
   const fetchAllListings = async () => {
-    setListings(dummyListings);
-    setLoading(false);
+    try {
+      const token = await getToken();
+      const { data } = await api.get("/api/admin/all-listings", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setListings(data.listings);
+      setLoading(false);
+    } catch (error) {
+      toast.error(error?.response?.data?.message || error.message);
+      console.log(error);
+    }
   };
 
   const changeListingStatus = async (status, listing) => {
-    setListings((prev) => [
-      ...prev.filter((l) => l.id !== listing.id),
-      { ...listing, status },
-    ]);
+    try {
+      toast.loading("changing status...");
+      const token = await getToken();
+      const { data } = await api.put(
+        `/api/admin/change-status/${listing.id}`,
+        { status },
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      await fetchAllListings();
+      toast.dismissAll();
+      toast.success(data.message);
+    } catch (error) {
+      toast.dismissAll();
+      toast.error(error?.response?.data?.message || error.message);
+      console.log(error);
+    }
   };
 
   const colorMapCredentials = {

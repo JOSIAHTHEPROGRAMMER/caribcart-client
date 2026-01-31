@@ -19,7 +19,7 @@ import {
   XCircle,
 } from "lucide-react";
 import React, { use, useMemo, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import StatCard from "../components/StatCard";
 import { formatCurrencyWithConversion, getUserCountry } from "../lib/utils";
@@ -28,12 +28,21 @@ import { useTime } from "motion/react";
 import CredentialSubmissionModal from "../components/CredentialSubmissionModal";
 import WithdrawlModal from "../components/WithdrawModal";
 import Pagination from "../components/Pagination";
+import {
+  getAllPublicListing,
+  getAllUserListing,
+} from "../app/features/listingSlice";
+import api from "../configs/axios";
+import { useAuth } from "@clerk/clerk-react";
+import toast from "react-hot-toast";
 
 const ITEMS_PER_PAGE = 6;
 
 const MyListing = () => {
   const { userListings, balance } = useSelector((state) => state.listing);
   const navigate = useNavigate();
+  const { getToken } = useAuth();
+  const dispatch = useDispatch();
   const [showCredSubmission, setShowCredSubmission] = useState(null);
   const [showWithdrawal, setShowWithdrawal] = useState(null);
 
@@ -84,11 +93,95 @@ const MyListing = () => {
     }
   };
 
-  const toggleStatus = async (listingId) => {};
+  const toggleStatus = async (listingId) => {
+    try {
+      toast.loading("Updating listing status...");
+      const token = await getToken();
+      const { data } = await api.put(
+        `/api/listing/${listingId}/status`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      dispatch(getAllUserListing({ getToken }));
+      dispatch(getAllPublicListing());
+      toast.dismissAll();
+      toast.success(data.message);
+    } catch (error) {
+      toast.dismissAll();
+      toast.error(error?.response?.data?.message || error.message);
+    }
+  };
 
-  const deleteListing = async (listingId) => {};
+  const deleteListing = async (listingId) => {
+    toast(
+      (t) => (
+        <div className="flex flex-col gap-3 ">
+          <div>
+            <p className="font-semibold text-black">Delete Listing?</p>
+            <p className="text-sm text-white mt-1">
+              Are you sure you want to delete this listing? If credentials are
+              changed, new credentials will be sent to your email.
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={async () => {
+                toast.dismiss(t.id);
+                toast.loading("Deleting listing...");
+                try {
+                  const token = await getToken();
+                  const { data } = await api.delete(
+                    `/api/listing/${listingId}`,
+                    {
+                      headers: { Authorization: `Bearer ${token}` },
+                    },
+                  );
+                  dispatch(getAllUserListing({ getToken }));
+                  dispatch(getAllPublicListing());
+                  toast.dismissAll();
+                  toast.success(data.message);
+                } catch (error) {
+                  toast.dismissAll();
+                  toast.error(error?.response?.data?.message || error.message);
+                }
+              }}
+              className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+            >
+              Delete
+            </button>
+            <button
+              onClick={() => toast.dismiss(t.id)}
+              className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      ),
+      {
+        duration: Infinity,
+      },
+    );
+  };
 
-  const markAsFeatured = async (listingId) => {};
+  const markAsFeatured = async (listingId) => {
+    try {
+      toast.loading("featuring listing...");
+      const token = await getToken();
+      const { data } = await api.put(
+        `/api/listing/featured/${listingId}`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      dispatch(getAllUserListing({ getToken }));
+      dispatch(getAllPublicListing());
+      toast.dismissAll();
+      toast.success(data.message);
+    } catch (error) {
+      toast.dismissAll();
+      toast.error(error?.response?.data?.message || error.message);
+    }
+  };
 
   const activeListings = userListings.filter(
     (listing) => listing.status === "active",
@@ -152,7 +245,7 @@ const MyListing = () => {
           title="Total Value"
           value={formatCurrencyWithConversion(
             totalValue.toFixed(2),
-            getUserCountry(),
+            "Trinidad & Tobago",
             getUserCountry(),
           )}
           icon={<DollarSign />}
@@ -197,7 +290,7 @@ const MyListing = () => {
             <span className="text-lg font-semibold text-gray-800">
               {formatCurrencyWithConversion(
                 Number(item.value).toFixed(2),
-                getUserCountry(),
+                "Trinidad & Tobago",
                 getUserCountry(),
               )}
             </span>
@@ -318,7 +411,7 @@ const MyListing = () => {
                       <StarIcon
                         onClick={() => markAsFeatured(listing.id)}
                         size={16}
-                        className={`text-yellow-500 ${
+                        className={`text-yellow-500 cursor-pointer ${
                           listing.featured && "fill-amber-300"
                         }`}
                       />
@@ -355,12 +448,12 @@ const MyListing = () => {
                     <span className="text-2xl font-bold text-gray-800">
                       {formatCurrencyWithConversion(
                         Number(listing.price).toFixed(2),
-                        getUserCountry(),
+                        "Trinidad & Tobago",
                         getUserCountry(),
                       )}
                     </span>
                     <div className="flex items-center space-x-2">
-                      {listing.status === "sold" && (
+                      {listing.status !== "sold" && (
                         <button
                           onClick={() => deleteListing(listing.id)}
                           className="p-2 border border-gray-300 

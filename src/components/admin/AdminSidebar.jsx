@@ -8,13 +8,10 @@ import {
   WalletIcon,
 } from "lucide-react";
 import { assets } from "../../assets/assets";
+import { useUser } from "@clerk/clerk-react";
 
 const AdminSidebar = () => {
-  const user = {
-    firstName: "Kevin",
-    lastName: "Dilton",
-    imageUrl: assets.user_profile,
-  };
+  const { user } = useUser();
 
   const adminNavlinks = [
     { name: "Dashboard", path: "/admin", icon: LayoutDashboardIcon },

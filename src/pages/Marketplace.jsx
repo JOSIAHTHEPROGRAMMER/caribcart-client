@@ -1,33 +1,34 @@
-import { ArrowLeftIcon } from 'lucide-react'
-import React, { useMemo, useState } from 'react'
-import { FiFilter } from 'react-icons/fi'
-import { useSelector } from 'react-redux'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { ArrowLeftIcon } from "lucide-react";
+import React, { useMemo, useState } from "react";
+import { FiFilter } from "react-icons/fi";
+import { useSelector } from "react-redux";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
-import ListingCard from '../components/ListingCard'
-import FilterSidebar from '../components/FilterSidebar'
-import Pagination from '../components/Pagination'
-import { convertCurrency } from '../lib/utils'
+import ListingCard from "../components/ListingCard";
+import FilterSidebar from "../components/FilterSidebar";
+import Pagination from "../components/Pagination";
+import { convertCurrency, getUserCountry } from "../lib/utils";
 
 const ITEMS_PER_PAGE = 6;
 
 const Marketplace = () => {
-  const navigate = useNavigate()
-  const { listings } = useSelector((state) => state.listing)
-  const [searchParams] = useSearchParams()
-  const search = searchParams.get("search")
+  const navigate = useNavigate();
+  const listings = useSelector((state) => state.listing.listings);
 
-  const [showFilterPhone, setShowFilterPhone] = useState(false)
-  const [currentPage, setCurrentPage] = useState(1)
+  const [searchParams] = useSearchParams();
+  const search = searchParams.get("search");
+
+  const [showFilterPhone, setShowFilterPhone] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState({
     country: null,
     platform: null,
-    maxPrice: convertCurrency(100000, "Trinidad & Tobago"),
+    maxPrice: convertCurrency(100000, "Trinidad & Tobago", getUserCountry()),
     minFollowers: 0,
     niche: null,
     verified: false,
     monetized: false,
-  })
+  });
 
   const filteredListings = useMemo(() => {
     return listings
@@ -40,16 +41,20 @@ const Marketplace = () => {
           if (!filters.country.includes(listing.country)) return false;
         }
 
-        if (filters.maxPrice) {
-          if (convertCurrency(listing.price, listing.country) > filters.maxPrice) return false;
-        }
+        const maxPriceNormalized = convertCurrency(
+          filters.maxPrice,
+          "Trinidad & Tobago",
+          listing.country,
+        );
+
+        //  if (listing.price > maxPriceNormalized) return false;
 
         if (filters.minFollowers) {
           if (listing.followers_count < filters.minFollowers) return false;
         }
 
-        if (filters.niche) {
-          if (listing.niche !== filters.niche) return false;
+        if (filters.niche && filters.niche.length > 0) {
+          if (!filters.niche.includes(listing.niche)) return false;
         }
 
         if (filters.verified && listing.verified !== filters.verified) {
@@ -61,7 +66,7 @@ const Marketplace = () => {
         }
 
         if (search) {
-          const query = search.trim().toLowerCase()
+          const query = search.trim().toLowerCase();
 
           const matches =
             listing.title?.toLowerCase().includes(query) ||
@@ -69,9 +74,9 @@ const Marketplace = () => {
             listing.description?.toLowerCase().includes(query) ||
             listing.country?.toLowerCase().includes(query) ||
             listing.platform?.toLowerCase().includes(query) ||
-            listing.niche?.toLowerCase().includes(query)
+            listing.niche?.toLowerCase().includes(query);
 
-          if (!matches) return false
+          if (!matches) return false;
         }
 
         return true;
@@ -96,7 +101,7 @@ const Marketplace = () => {
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
@@ -104,8 +109,8 @@ const Marketplace = () => {
       <div className="flex items-center justify-between text-slate-500">
         <button
           onClick={() => {
-            navigate('/')
-            scrollTo(0, 0)
+            navigate("/");
+            scrollTo(0, 0);
           }}
           className="flex sm:hidden items-center gap-2 py-5"
         >
@@ -123,11 +128,11 @@ const Marketplace = () => {
       </div>
 
       <div className="relative flex items-start justify-between gap-8 pb-8">
-        <FilterSidebar 
+        <FilterSidebar
           setShowFilterPhone={setShowFilterPhone}
-          setFilters={setFilters} 
+          setFilters={setFilters}
           showFilterPhone={showFilterPhone}
-          filters={filters} 
+          filters={filters}
         />
 
         <div className="flex-1">
@@ -137,7 +142,11 @@ const Marketplace = () => {
               <p>No listings found matching your criteria.</p>
             ) : (
               <p>
-                Found <span className="font-medium text-gray-800">{filteredListings.length}</span> listing{filteredListings.length !== 1 && 's'}
+                Found{" "}
+                <span className="font-medium text-gray-800">
+                  {filteredListings.length}
+                </span>{" "}
+                listing{filteredListings.length !== 1 && "s"}
               </p>
             )}
           </div>
@@ -158,30 +167,29 @@ const Marketplace = () => {
               <div className="w-16 h-16 mb-4 rounded-full bg-gray-100 flex items-center justify-center">
                 <FiFilter className="w-8 h-8 text-gray-400" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">No listings found</h3>
-              <p className="text-gray-600 mb-4">Try adjusting your filters or search query</p>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                No listings found
+              </h3>
+              <p className="text-gray-600 mb-4">
+                Try adjusting your filters or search query
+              </p>
             </div>
           )}
-
-
         </div>
       </div>
-      <div>
-
-        
-      </div>
-          {/* Pagination */}
-          {filteredListings.length > 0 && (
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-              itemsPerPage={ITEMS_PER_PAGE}
-              totalItems={filteredListings.length}
-            />
-          )}
+      <div></div>
+      {/* Pagination */}
+      {filteredListings.length > 0 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+          itemsPerPage={ITEMS_PER_PAGE}
+          totalItems={filteredListings.length}
+        />
+      )}
     </div>
-  )
-}
+  );
+};
 
-export default Marketplace
+export default Marketplace;

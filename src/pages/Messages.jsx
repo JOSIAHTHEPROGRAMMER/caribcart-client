@@ -5,15 +5,18 @@ import { getDateLabel } from "../lib/utils";
 import { useDispatch } from "react-redux";
 import { setChat } from "../app/features/chatSlice";
 import { Link } from "react-router-dom";
+import api from "../configs/axios";
+import { useAuth, useUser } from "@clerk/clerk-react";
+import { toast } from "react-hot-toast";
 
 const Messages = () => {
-  const user = { id: "user_6" };
+  const dispatch = useDispatch();
+  const { user, isLoaded } = useUser();
+  const { getToken } = useAuth();
 
   const [chats, setChats] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
-
-  const dispatch = useDispatch();
 
   const filteredChats = useMemo(() => {
     if (!searchQuery) return chats;
@@ -35,28 +38,34 @@ const Messages = () => {
       setChat({
         listing: chat.listing,
         chatId: chat.id,
-      })
+      }),
     );
   };
 
   const fetchUserChats = async () => {
-    // Filter to only show chats where the user is a participant
-    const userChats = dummyChats.filter(
-      (chat) => chat.chatUserId === user.id || chat.ownerUserId === user.id
-    );
-    setChats(userChats);
-    setLoading(false);
+    try {
+      const token = await getToken();
+      const { data } = await api.get("/api/chat/user", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setChats(data.chats);
+      setLoading(false);
+    } catch (error) {
+      toast.error(error?.response?.data?.message || error.message);
+      console.log(error);
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    fetchUserChats();
-
-    const interval = setInterval(() => {
+    if (user && isLoaded) {
       fetchUserChats();
-    }, 10 * 1000);
-
-    return () => clearInterval(interval);
-  }, []);
+      const interval = setInterval(() => {
+        fetchUserChats();
+      }, 10 * 1000);
+      return () => clearInterval(interval);
+    }
+  }, [user, isLoaded]);
 
   return (
     <div
@@ -116,7 +125,7 @@ const Messages = () => {
             className="bg-white rounded-lg shadow-xs 
           border border-gray-200 divide-y divide-gray-200"
           >
-            {filteredChats.map((chat) => {
+            {filteredChats.map((chat, index) => {
               const chatUser =
                 chat.chatUserId === user.id ? chat.ownerUser : chat.chatUser;
 
@@ -126,6 +135,8 @@ const Messages = () => {
 
               return (
                 <div
+                  key={chat.id}
+                  index={index}
                   onClick={() => handleOpenChat(chat)}
                   className="w-full text-left hover:bg-gray-100 transition-colors cursor-pointer"
                 >

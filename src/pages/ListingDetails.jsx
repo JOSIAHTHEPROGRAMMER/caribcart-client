@@ -16,13 +16,16 @@ import {
   ShoppingBagIcon,
   Users,
 } from "lucide-react";
-import { formatCurrencyWithConversion } from "../lib/utils";
+import { formatCurrencyWithConversion, getUserCountry } from "../lib/utils";
 import Badge from "../components/ui/Badge";
 import SliderButton from "../components/ui/SliderButton";
 import InfoCard from "../components/ui/InfoCard";
 import Metric from "../components/ui/Metric";
 import Detail from "../components/ui/Detail";
 import { setChat } from "../app/features/chatSlice";
+import { useAuth, useClerk, useUser } from "@clerk/clerk-react";
+import toast from "react-hot-toast";
+import api from "../configs/axios";
 
 const ListingDetails = () => {
   const navigate = useNavigate();
@@ -32,6 +35,9 @@ const ListingDetails = () => {
   const [listing, setListing] = useState(null);
   const [current, setCurrent] = useState(0);
 
+  const { user } = useUser();
+  const { getToken } = useAuth();
+  const { openSignIn } = useClerk();
   const dispatch = useDispatch();
 
   const images = listing?.images || [];
@@ -70,15 +76,30 @@ const ListingDetails = () => {
     touchEndX.current = null;
   };
 
-  const handlePurchaseAccount = async () => {};
-
+  const handlePurchaseAccount = async () => {
+    try {
+      if (!user) return openSignIn();
+      toast.loading("creating payment link...");
+      const token = await getToken();
+      const { data } = await api.get(
+        `/api/listing/purchase-account/${listing.id}`,
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      toast.dismissAll();
+      window.location.href = data.paymentLink;
+    } catch (error) {
+      toast.dismissAll();
+      toast.error(error?.response?.data?.message || error.message);
+      console.log(error);
+    }
+  };
   const handleLoadChat = () => {
-    const existingChat = dummyChats.find((c) => c.listing.id === listing.id);
+    if (user.id === listing.ownerId)
+      return toast("This is your listing, please look at others!");
 
     dispatch(
       setChat({
         listing,
-        chatId: existingChat?.id ?? null,
       }),
     );
   };
@@ -159,7 +180,11 @@ const ListingDetails = () => {
               </div>
 
               <div className="text-lg font-bold text-gray-800 whitespace-nowrap">
-                {formatCurrencyWithConversion(listing.price, listing.country)}
+                {formatCurrencyWithConversion(
+                  listing.price,
+                  "Trinidad & Tobago",
+                  getUserCountry(),
+                )}
               </div>
             </div>
           </div>

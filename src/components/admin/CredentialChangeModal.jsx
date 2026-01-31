@@ -9,12 +9,15 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { dummyOrders, socialMediaLinks } from "../../assets/assets";
+import { useAuth } from "@clerk/clerk-react";
+import api from "../../configs/axios";
 
 const CredentialChangeModal = ({ listing, onClose }) => {
   const [loading, setLoading] = useState(true);
   const [credential, setCredential] = useState(null);
   const [newCredential, setNewCredential] = useState(null);
   const [isChanged, setIsChanged] = useState(false);
+  const { getToken } = useAuth();
 
   const copyToClipboard = ({ name, value }) => {
     navigator.clipboard.writeText(value);
@@ -22,11 +25,40 @@ const CredentialChangeModal = ({ listing, onClose }) => {
   };
 
   const fetchCredential = async () => {
-    setCredential(dummyOrders[0].credential);
-    setLoading(false);
+    try {
+      const token = await getToken();
+      const { data } = await api.get(`/api/admin/credential/${listing.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setCredential(data.credential);
+      setNewCredential(
+        data.credential.originalCredential.map((cred) => ({
+          ...cred,
+          value: "",
+        })),
+      );
+      setLoading(false);
+    } catch (error) {
+      toast.error(error?.response?.data?.message || error.message);
+      console.log(error);
+    }
   };
 
-  const changeCredential = async () => {};
+  const changeCredential = async () => {
+    try {
+      const token = await getToken();
+      const { data } = await api.put(
+        `/api/admin/change-credential/${listing.id}`,
+        { newCredential, credentialId: credential.id },
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      toast.success(data.message);
+      onClose();
+    } catch (error) {
+      toast.error(error?.response?.data?.message || error.message);
+      console.log(error);
+    }
+  };
 
   useEffect(() => {
     fetchCredential();
@@ -36,7 +68,7 @@ const CredentialChangeModal = ({ listing, onClose }) => {
     <div className="fixed inset-0 bg-black/70 backdrop-blur bg-opacity-50 z-100 flex items-center justify-center sm:p-4">
       <div className="bg-white sm:rounded-lg shadow-2xl w-full max-w-xl h-screen sm:h-[450px] flex flex-col">
         {/* Header */}
-        <div className="bg-gradient-to-r from-sky-600 to-sky-400 text-white p-4 sm:rounded-t-lg flex items-center justify-between">
+        <div className="bg-linear-to-r from-sky-600 to-sky-400 text-white p-4 sm:rounded-t-lg flex items-center justify-between">
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-lg truncate">{listing?.title}</h3>
             <p className="text-sm text-sky-100 truncate">

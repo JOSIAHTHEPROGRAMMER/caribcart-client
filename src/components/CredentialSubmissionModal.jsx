@@ -1,8 +1,15 @@
+import { useAuth } from "@clerk/clerk-react";
 import { CirclePlus, ListIcon, X } from "lucide-react";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { getAllUserListing } from "../app/features/listingSlice";
+import api from "../configs/axios";
 
 const CredentialSubmissionModal = ({ onClose, listing }) => {
+  const { getToken } = useAuth();
+  const dispatch = useDispatch();
+
   const [newField, setNewField] = useState("");
   const [credential, setCredential] = useState([
     { type: "email", name: "Email", value: "" },
@@ -17,7 +24,77 @@ const CredentialSubmissionModal = ({ onClose, listing }) => {
 
   const handleSubmission = async (e) => {
     e.preventDefault();
+    try {
+      // check if there is at least one field
+      if (credential.length === 0) {
+        return toast.error("Please add at least one field");
+      }
+
+      // check all fields are filled
+      for (const cred of credential) {
+        if (!cred.value) {
+          return toast.error(`Please fill in the ${cred.name} field`);
+        }
+      }
+
+      // React-hot-toast confirmation
+      toast(
+        (t) => (
+          <div className="flex flex-col gap-3">
+            <div>
+              <p className="font-semibold">Submit Credentials?</p>
+              <p className="text-sm text-gray-600 mt-1">
+                Credential will be verified & changed post submission. Are you
+                sure you want to submit?
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={async () => {
+                  toast.dismiss(t.id);
+                  toast.loading("Submitting credentials...");
+                  try {
+                    const token = await getToken();
+                    const { data } = await api.post(
+                      "/api/listing/add-credential",
+                      { credential, listingId: listing.id },
+                      { headers: { Authorization: `Bearer ${token}` } },
+                    );
+                    toast.dismissAll();
+                    toast.success(data.message);
+                    dispatch(getAllUserListing({ getToken }));
+                    onClose();
+                  } catch (error) {
+                    toast.dismissAll();
+                    toast.error(
+                      error?.response?.data?.message || error?.message,
+                    );
+                    console.log(error);
+                  }
+                }}
+                className="px-4 py-2 bg-sky-600 text-white rounded-md hover:bg-sky-700"
+              >
+                Submit
+              </button>
+              <button
+                onClick={() => toast.dismiss(t.id)}
+                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        ),
+        {
+          duration: Infinity,
+        },
+      );
+    } catch (error) {
+      toast.error(error?.response?.data?.message || error?.message);
+      console.log(error);
+    }
   };
+
   return (
     <div
       className="fixed inset-0 bg-black/70 backdrop-blur bg-opacity-50 

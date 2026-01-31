@@ -6,20 +6,19 @@ import {
   UserIcon,
 } from "lucide-react";
 import { useEffect } from "react";
+import { formatCurrencyWithConversion, getUserCountry } from "../../lib/utils";
 
 const ListingDetailsModal = ({ listing, onClose }) => {
-  const currency = import.meta.env.VITE_CURRENCY || "$";
-
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => (document.body.style.overflow = "auto");
   }, []);
 
   return (
-    <div className="fixed inset-0 bg-black/70 z-[100] backdrop-blur flex items-center justify-center sm:p-4">
+    <div className="fixed inset-0 bg-black/70 z-100 backdrop-blur flex items-center justify-center sm:p-4">
       <div className="bg-white sm:rounded-lg w-full max-w-2xl h-screen sm:h-[600px] flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-sky-600 to-sky-400 text-white p-4 sm:rounded-t-lg flex items-center justify-between">
+        <div className="bg-linear-to-r from-sky-600 to-sky-400 text-white p-4 sm:rounded-t-lg flex items-center justify-between">
           <div className="flex flex-col">
             <h3 className="font-semibold text-lg">{listing.title}</h3>
             <p className="text-sm text-sky-100">
@@ -170,8 +169,11 @@ const ListingDetailsModal = ({ listing, onClose }) => {
               {new Date(listing.createdAt).toLocaleDateString()}
             </div>
             <p className="text-lg font-semibold text-sky-600">
-              {currency}
-              {listing.price?.toLocaleString()}
+              {formatCurrencyWithConversion(
+                listing.price,
+                "Trinidad & Tobago",
+                listing.country,
+              )}
             </p>
           </div>
         </div>
