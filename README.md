@@ -212,7 +212,7 @@ Previews the production build locally.
 Create a `.env` file in the root directory with the following variables:
 ```env
 VITE_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
-VITE_API_URL=your_backend_api_url
+VITE_BASEURL=your_backend_api_url
 ```
 
 Refer to `.env.example` for the complete list of required environment variables.
@@ -267,6 +267,14 @@ Refer to `.env.example` for the complete list of required environment variables.
 - **Withdrawal** - Handle withdrawal requests
 - **Credential Verify** - Verify user credentials
 - **Credential Change** - Process credential changes
+
+
+## Backend
+The backend for this project lives in a separate repository and handles authentication, listings, messaging, transactions, and admin operations.
+
+Client Server: https://github.com/JOSIAHTHEPROGRAMMER/caribcart-server
+
+
 
 ## Contributing
 
