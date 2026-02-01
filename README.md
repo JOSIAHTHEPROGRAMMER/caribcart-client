@@ -269,6 +269,17 @@ Refer to `.env.example` for the complete list of required environment variables.
 - **Credential Change** - Process credential changes
 
 
+## Stripe Test Card
+
+**Successful Payment:**
+- Card Number: `4242 4242 4242 4242`
+- CVC: Any 3 digits
+- Expiry: Any future date
+- ZIP: Any valid code
+
+[Full test card documentation](https://stripe.com/docs/testing)
+
+
 ## Backend
 The backend for this project lives in a separate repository and handles authentication, listings, messaging, transactions, and admin operations.
 
