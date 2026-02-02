@@ -92,7 +92,7 @@ Designed specifically for the Caribbean market, CaribCart offers multi-currency 
 | Dominican Republic | DOP | $ |
 | Cuba | CUP | $ |
 
-**Note:** USD is used as the default currency for unsupported regions.
+**Note:** TTD is used as the default currency for unsupported regions.
 
 ## Tech Stack
 
