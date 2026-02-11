@@ -105,7 +105,7 @@ const Marketplace = () => {
   };
 
   return (
-    <div className="px-6 mt-4 md:px-16 lg:px-24 xl:px-32">
+    <div className="px-4 sm:px-6 mt-4 md:px-16 lg:px-24 xl:px-32 pb-24">
       <div className="flex items-center justify-between text-slate-500">
         <button
           onClick={() => {
@@ -127,7 +127,7 @@ const Marketplace = () => {
         </button>
       </div>
 
-      <div className="relative flex items-start justify-between gap-8 pb-8">
+      <div className="relative flex flex-col lg:flex-row items-start justify-between gap-8 pb-8">
         <FilterSidebar
           setShowFilterPhone={setShowFilterPhone}
           setFilters={setFilters}
@@ -135,7 +135,7 @@ const Marketplace = () => {
           filters={filters}
         />
 
-        <div className="flex-1">
+        <div className="flex-1 w-full">
           {/* Results count */}
           <div className="mb-4 text-sm text-gray-600">
             {filteredListings.length === 0 ? (
@@ -152,7 +152,7 @@ const Marketplace = () => {
           </div>
 
           {/* Listings grid */}
-          <div className="grid xl:grid-cols-2 gap-4 max-h-280">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 w-full">
             {currentListings.map((listing) => (
               <ListingCard
                 key={`${listing.platform}-${listing.username}-${listing.price}`}
@@ -177,19 +177,20 @@ const Marketplace = () => {
           )}
         </div>
       </div>
-      <div></div>
+
       {/* Pagination */}
       {filteredListings.length > 0 && (
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
-          itemsPerPage={ITEMS_PER_PAGE}
-          totalItems={filteredListings.length}
-        />
+        <div className="mt-10 flex justify-center">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            itemsPerPage={ITEMS_PER_PAGE}
+            totalItems={filteredListings.length}
+          />
+        </div>
       )}
     </div>
   );
 };
-
 export default Marketplace;
