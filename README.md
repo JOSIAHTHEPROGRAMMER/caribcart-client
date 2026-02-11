@@ -92,7 +92,7 @@ Designed specifically for the Caribbean market, CaribCart offers multi-currency 
 | Dominican Republic | DOP | $ |
 | Cuba | CUP | $ |
 
-**Note:** USD is used as the default currency for unsupported regions.
+**Note:** TTD is used as the default currency for unsupported regions.
 
 ## Tech Stack
 
@@ -267,6 +267,17 @@ Refer to `.env.example` for the complete list of required environment variables.
 - **Withdrawal** - Handle withdrawal requests
 - **Credential Verify** - Verify user credentials
 - **Credential Change** - Process credential changes
+
+
+## Stripe Test Card
+
+**Successful Payment:**
+- Card Number: `4242 4242 4242 4242`
+- CVC: Any 3 digits
+- Expiry: Any future date
+- ZIP: Any valid code
+
+[Full test card documentation](https://stripe.com/docs/testing)
 
 
 ## Backend
